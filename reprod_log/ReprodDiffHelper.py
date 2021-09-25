@@ -17,7 +17,7 @@ import sys
 import numpy as np
 
 from utils import init_logger
-from compare import compute_diff
+from compare import compute_diff, check_data
 
 
 class ReprodDiffHelper:
@@ -37,6 +37,8 @@ class ReprodDiffHelper:
         :param info2:
         :return:
         """
+        assert isinstance(info1, dict) and isinstance(info2, dict)
+        check_data(info1, info2)
         self.diff = compute_diff(info1, info2)
 
     def report(self, diff_threshold=1e-6, path=None):
