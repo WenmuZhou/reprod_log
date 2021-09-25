@@ -69,9 +69,9 @@ def compare_forward(torch_model: torch.nn.Module,
     diff = compute_diff(torch2np(torch_out), paddle2np(paddle_out))
     passed = print_diff(diff, diff_threshold)
     if passed:
-        print('Check passed')
+        print('diff check passed')
     else:
-        print('Check not passed')
+        print('diff check failed')
 
 
 def compare_loss_and_backward(torch_model: torch.nn.Module,
@@ -121,6 +121,6 @@ def compare_loss_and_backward(torch_model: torch.nn.Module,
         diff = compute_diff(paddle_grad_dict, torch_grad_dict)
         passed = print_diff(diff, diff_threshold)
         if not passed:
-            print('Check not passed as iter {}'.format(i))
+            print('diff check failed at iter {}'.format(i))
             sys.exit()
-    print('Check passed')
+    print('diff check passed')

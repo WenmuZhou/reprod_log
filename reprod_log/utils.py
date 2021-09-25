@@ -94,6 +94,6 @@ def print_diff(diff_dict, diff_threshold: float=1e-6):
         mean_value = v['diff'].mean()
         print("{}\t, diff mean: {}".format(k, mean_value))
         if mean_value > diff_threshold:
-            print('diff in {} failed the acceptance'.format(k))
+            print('diff in {} check failed'.format(k))
             passed = False
     return passed
