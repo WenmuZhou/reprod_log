@@ -31,7 +31,7 @@ class ReprodLogger(object):
                 2. Torch CPU: torch_tensor.detach().numpy()
                 3. Paddle: paddle_tensor.numpy()'''
         assert isinstance(val, np.ndarray), msg
-        self.data.update(key, val)
+        self.data[key] = val
 
     def remove(self, key):
         """
