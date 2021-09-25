@@ -54,12 +54,12 @@ def compute_diff(data1: dict, data2: dict, indent: str='\t'):
     return out_dict
 
 
-def compare_model(torch_model: torch.nn.Module,
-                  paddle_model: paddle.nn.Layer,
-                  input: dict=None,
-                  diff_threshold: float=1e-6):
-    torch_input = np2torch(input)
-    paddle_input = np2paddle(input)
+def compare_forward(torch_model: torch.nn.Module,
+                    paddle_model: paddle.nn.Layer,
+                    input_dict: dict,
+                    diff_threshold: float=1e-6):
+    torch_input = np2torch(input_dict)
+    paddle_input = np2paddle(input_dict)
 
     torch_model.eval()
     paddle_model.eval()
@@ -74,16 +74,16 @@ def compare_model(torch_model: torch.nn.Module,
         print('Check not passed')
 
 
-def compare_grad(torch_model: torch.nn.Module,
-                 paddle_model: paddle.nn.Layer,
-                 torch_loss: torch.nn.Module,
-                 paddle_loss: paddle.nn.Layer,
-                 lr: float=1e-3,
-                 steps: int=10,
-                 input: dict=None,
-                 diff_threshold: float=1e-6):
-    torch_input = np2torch(input)
-    paddle_input = np2paddle(input)
+def compare_backward_and_loss(torch_model: torch.nn.Module,
+                              paddle_model: paddle.nn.Layer,
+                              torch_loss: torch.nn.Module,
+                              paddle_loss: paddle.nn.Layer,
+                              input_dict: dict,
+                              lr: float=1e-3,
+                              steps: int=10,
+                              diff_threshold: float=1e-6):
+    torch_input = np2torch(input_dict)
+    paddle_input = np2paddle(input_dict)
 
     torch_model.eval()
     paddle_model.eval()
@@ -100,20 +100,19 @@ def compare_grad(torch_model: torch.nn.Module,
         paddle_optim.step()
         paddle_optim.clear_grad()
 
-        paddle_grad_dict = {}
+        paddle_grad_dict = {'loss': paddle_loss_value['loss'].numpy()}
         for name, parms in paddle_model.named_parameters():
             if not parms.stop_gradient and parms.grad is not None:
                 paddle_grad_dict[name] = parms.grad.numpy()
 
         # torch
-
         torch_outputs = torch_model(**torch_input)
         torch_loss_value = torch_loss(torch_input, torch_outputs)
         torch_loss_value['loss'].backward()
         torch_optim.step()
         torch_optim.zero_grad()
 
-        torch_grad_dict = {}
+        torch_grad_dict = {'loss': torch_loss_value['loss'].detach().numpy()}
         for name, parms in torch_model.named_parameters():
             if parms.requires_grad and parms.grad is not None:
                 torch_grad_dict[name] = parms.grad.numpy()
