@@ -20,6 +20,16 @@ import numpy as np
 from utils import np2torch, np2paddle, paddle2np, torch2np
 
 
+def check_data(data1: dict, data2: dict):
+    for k in data1:
+        if k not in data2:
+            assert k in data2, 'k in data1 but not found in data2'.format(k, data2)
+
+    for k in data2:
+        if k not in data1:
+            assert k in data1, 'k in data2 but not found in data1'.format(k, data2.keys())
+
+
 def compute_diff(data1: dict, data2: dict, indent='\t'):
     out_dict = {}
     for k in data1:
