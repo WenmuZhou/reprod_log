@@ -14,8 +14,6 @@
 
 from setuptools import setup, find_packages
 
-# python3.7 setup.py bdist_wheel
-
 with open('requirements.txt', encoding="utf-8-sig") as f:
     requirements = f.readlines()
 

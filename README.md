@@ -1,7 +1,21 @@
 # reprod_log
 
 主要用于对比和记录模型复现过程中的各个步骤精度对齐情况
+## 安装
 
+1. 本地编译安装
+```bash
+python3 setup.py bdist_wheel
+python3 install dist/reprod_log-x.x.-py3-none-any.whl --force-reinstall
+```
+
+2. pip直接安装
+```bash
+# from pypi
+pip3 install reprod_log --force-reinstall
+# from github, 取决于网络环境
+pip3 install git+https://github.com/WenmuZhou/reprod_log.git --force-reinstall
+```
 ## 提供的类和方法
 
 类 `ReprodLogger` 用于记录和报错复现过程中的中间变量
