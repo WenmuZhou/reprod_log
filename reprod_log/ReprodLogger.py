@@ -19,18 +19,6 @@ import numpy as np
 class ReprodLogger(object):
     def __init__(self):
         self.data = dict()
-        self.keys = [
-            'forward_paddle',
-            'forward_torch',
-            'metric_paddle',
-            'metric_torch',
-            'loss_paddle',
-            'loss_torch',
-            'bp_align_paddle',
-            'bp_align_torch',
-            'train_align_paddle',
-            'train_align_benchmark'
-        ]
 
     def add(self, key, val):
         """
@@ -44,7 +32,6 @@ class ReprodLogger(object):
                 2. Torch CPU: torch_tensor.detach().numpy()
                 3. Paddle: paddle_tensor.numpy()'''
         assert isinstance(val, np.ndarray), msg
-        assert key in self.keys
         self.data.update(key, val)
 
     def remove(self, key):
