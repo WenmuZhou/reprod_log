@@ -74,7 +74,7 @@ def compare_forward(torch_model: torch.nn.Module,
         print('Check not passed')
 
 
-def compare_backward_and_loss(torch_model: torch.nn.Module,
+def compare_loss_and_backward(torch_model: torch.nn.Module,
                               paddle_model: paddle.nn.Layer,
                               torch_loss: torch.nn.Module,
                               paddle_loss: paddle.nn.Layer,

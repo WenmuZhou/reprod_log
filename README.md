@@ -43,7 +43,7 @@ pip3 install git+https://github.com/WenmuZhou/reprod_log.git --force-reinstall
   * input_dict: dict, dict值为numpy矩阵
   * diff_threshold: float=1e-6
 
-* compare_backward_and_loss 用于对比网络的反向过程，其参数为
+* compare_loss_and_backward 用于对比网络的反向过程，其参数为
   * torch_model: torch.nn.Module,
   * paddle_model: paddle.nn.Layer,
   * torch_loss: torch.nn.Module,
