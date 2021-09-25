@@ -1,0 +1,69 @@
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
+# Copyright 2018 The Google AI Language Team Authors and The HuggingFace Inc. team.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import numpy as np
+
+
+class ReprodLogger(object):
+    def __init__(self):
+        self.data = dict()
+        self.keys = [
+            'forward_paddle',
+            'forward_torch',
+            'metric_paddle',
+            'metric_torch',
+            'loss_paddle',
+            'loss_torch',
+            'bp_align_paddle',
+            'bp_align_torch',
+            'train_align_paddle',
+            'train_align_benchmark'
+        ]
+
+    def add(self, key, val):
+        """
+        添加key-val pair
+        :param key:
+        :param val:
+        :return:
+        """
+        msg = '''val must be np.ndarray, you can convert it by follow code:
+                1. Torch GPU: torch_tensor.cpu().detach().numpy()
+                2. Torch CPU: torch_tensor.detach().numpy()
+                3. Paddle: paddle_tensor.numpy()'''
+        assert isinstance(val, np.ndarray), msg
+        assert key in self.keys
+        self.data.update(key, val)
+
+    def remove(self, key):
+        """
+        移除key
+        :param key:
+        :return:
+        """
+        if key in self.data:
+            self.data.pop(key)
+        else:
+            print('{} is not in {}'.format(key, self.data.keys()))
+
+    def clear(self):
+        """
+        清空字典
+        :return:
+        """
+        self.data.clear()
+
+    def save(self, path):
+        np.save('{}.data'.format(path), self.data)

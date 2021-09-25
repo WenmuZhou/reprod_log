@@ -12,9 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import torch
 import paddle
 import numpy as np
+
+from utils import np2torch, np2paddle, paddle2np, torch2np
 
 
 def compute_diff(data1: dict, data2: dict, indent='\t'):
@@ -35,57 +38,14 @@ def compute_diff(data1: dict, data2: dict, indent='\t'):
     return out_dict
 
 
-def np2torch(data: dict):
-    torch_input = {}
-    for k, v in data.items():
-        if isinstance(v, np.ndarray):
-            torch_input[k] = torch.Tensor(v)
-        else:
-            torch_input[k] = v
-    return torch_input
-
-
-def np2paddle(data: dict):
-    paddle_input = {}
-    for k, v in data.items():
-        if isinstance(v, np.ndarray):
-            paddle_input[k] = paddle.Tensor(v)
-        else:
-            paddle_input[k] = v
-    return paddle_input
-
-
-def paddle2np(data):
-    if isinstance(data, dict):
-        np_data = {}
-        for k, v in data.items():
-            np_data[k] = v.numpy()
-        return np_data
-    else:
-        return {'output': data.numpy()}
-
-
-def torch2np(data):
-    if isinstance(data, dict):
-        np_data = {}
-        for k, v in data.items():
-            np_data[k] = v.detach().numpy()
-        return np_data
-    else:
-        return {'output': data.detach().numpy()}
-
-
-def print_diff(diff_dict, desc=''):
-    print(f"{'*' * 10} {desc} {'*' * 10}")
-    for k, v in diff_dict.items():
-        print(k, f"diff max: {v['diff'].max()},diff mean: {v['diff'].mean()}")
-
-
 def compare_model(torch_model: torch.nn.Module,
                   paddle_model: paddle.nn.Layer,
                   input: dict = None):
     torch_input = np2torch(input)
     paddle_input = np2paddle(input)
+
+    torch_model.eval()
+    paddle_model.eval()
     torch_out = torch_model(**torch_input)
     paddle_out = paddle_model(**paddle_input)
 
