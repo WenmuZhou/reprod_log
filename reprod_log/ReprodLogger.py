@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
 
 import numpy as np
 
@@ -52,4 +53,6 @@ class ReprodLogger(object):
         self.data.clear()
 
     def save(self, path):
+        folder = os.path.split(path)
+        os.makedirs(folder, exist_ok=True)
         np.save(path, self.data)
