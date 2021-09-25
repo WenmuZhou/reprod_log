@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import sys
 
 import torch
 import paddle
 import numpy as np
 
-from .utils import np2torch, np2paddle, paddle2np, torch2np
+from .utils import np2torch, np2paddle, paddle2np, torch2np, print_diff
 
 
 def check_data(data1: dict, data2: dict):
@@ -42,6 +43,10 @@ def compute_diff(data1: dict, data2: dict, indent: str='\t'):
             for sub_k, sub_v in out.items():
                 out_dict[f'{k}{indent}{sub_k}'] = sub_v
         elif isinstance(sub_data1, np.ndarray):
+            if sub_data1.shape != sub_data2.shape and sub_data1.transpose(
+            ).shape == sub_data2.shape:
+                print('transpose sub_data1')
+                sub_data1 = sub_data1.transpose()
             diff = np.abs(sub_data1 - sub_data2)
             out_dict[k] = {'out1': sub_data1, 'out2': sub_data2, 'diff': diff}
         else:
@@ -51,7 +56,8 @@ def compute_diff(data1: dict, data2: dict, indent: str='\t'):
 
 def compare_model(torch_model: torch.nn.Module,
                   paddle_model: paddle.nn.Layer,
-                  input: dict=None):
+                  input: dict=None,
+                  diff_threshold: float=1e-6):
     torch_input = np2torch(input)
     paddle_input = np2paddle(input)
 
@@ -61,4 +67,61 @@ def compare_model(torch_model: torch.nn.Module,
     paddle_out = paddle_model(**paddle_input)
 
     diff = compute_diff(torch2np(torch_out), paddle2np(paddle_out))
-    return diff
+    passed = print_diff(diff, diff_threshold)
+    if passed:
+        print('Check passed')
+    else:
+        print('Check not passed')
+
+
+def compare_grad(torch_model: torch.nn.Module,
+                 paddle_model: paddle.nn.Layer,
+                 torch_loss: torch.nn.Module,
+                 paddle_loss: paddle.nn.Layer,
+                 lr: float=1e-3,
+                 steps: int=10,
+                 input: dict=None,
+                 diff_threshold: float=1e-6):
+    torch_input = np2torch(input)
+    paddle_input = np2paddle(input)
+
+    torch_model.eval()
+    paddle_model.eval()
+
+    torch_optim = torch.optim.SGD(params=torch_model.parameters(), lr=lr)
+    paddle_optim = paddle.optimizer.SGD(parameters=paddle_model.parameters(),
+                                        learning_rate=lr)
+
+    for i in range(steps):
+        # paddle
+        paddle_outputs = paddle_model(**paddle_input)
+        paddle_loss_value = paddle_loss(paddle_input, paddle_outputs)
+        paddle_loss_value['loss'].backward()
+        paddle_optim.step()
+        paddle_optim.clear_grad()
+
+        paddle_grad_dict = {}
+        for name, parms in paddle_model.named_parameters():
+            if not parms.stop_gradient and parms.grad is not None:
+                paddle_grad_dict[name] = parms.grad.numpy()
+
+        # torch
+
+        torch_outputs = torch_model(**torch_input)
+        torch_loss_value = torch_loss(torch_input, torch_outputs)
+        torch_loss_value['loss'].backward()
+        torch_optim.step()
+        torch_optim.zero_grad()
+
+        torch_grad_dict = {}
+        for name, parms in torch_model.named_parameters():
+            if parms.requires_grad and parms.grad is not None:
+                torch_grad_dict[name] = parms.grad.numpy()
+
+        # compare
+        diff = compute_diff(paddle_grad_dict, torch_grad_dict)
+        passed = print_diff(diff, diff_threshold)
+        if not passed:
+            print('Check not passed as iter {}'.format(i))
+            sys.exit()
+    print('Check passed')

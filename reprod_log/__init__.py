@@ -14,4 +14,4 @@
 
 from .ReprodLogger import ReprodLogger
 from .ReprodDiffHelper import ReprodDiffHelper
-from . import utils
+from . import utils, compare

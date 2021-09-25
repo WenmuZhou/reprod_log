@@ -46,6 +46,7 @@ def init_logger(save_path: str=None):
 
 
 def np2torch(data: dict):
+    assert isinstance(data, dict)
     torch_input = {}
     for k, v in data.items():
         if isinstance(v, np.ndarray):
@@ -56,6 +57,7 @@ def np2torch(data: dict):
 
 
 def np2paddle(data: dict):
+    assert isinstance(data, dict)
     paddle_input = {}
     for k, v in data.items():
         if isinstance(v, np.ndarray):
@@ -85,7 +87,13 @@ def torch2np(data: Union[torch.Tensor, dict]=None):
         return {'output': data.detach().numpy()}
 
 
-def print_diff(diff_dict, desc=''):
-    print(f"{'*' * 10} {desc} {'*' * 10}")
+def print_diff(diff_dict, diff_threshold: float=1e-6):
+    print("{}".format('*' * 20))
+    passed = True
     for k, v in diff_dict.items():
-        print(k, f"diff max: {v['diff'].max()},diff mean: {v['diff'].mean()}")
+        mean_value = v['diff'].mean()
+        print("{}\t, diff mean: {}".format(k, mean_value))
+        if mean_value > diff_threshold:
+            print('diff in {} failed the acceptance'.format(k))
+            passed = False
+    return passed
