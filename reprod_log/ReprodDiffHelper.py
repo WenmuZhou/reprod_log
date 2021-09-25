@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os.path
 import sys
 
 import numpy as np
@@ -26,6 +27,7 @@ class ReprodDiffHelper:
         :param path:
         :return:
         """
+        assert os.path.exists(path)
         data = np.load(path, allow_pickle=True).tolist()
         return data
 
