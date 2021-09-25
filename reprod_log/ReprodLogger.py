@@ -53,6 +53,7 @@ class ReprodLogger(object):
         self.data.clear()
 
     def save(self, path):
-        folder = os.path.split(path)[0]
-        os.makedirs(folder, exist_ok=True)
+        folder = os.path.dirname(path)
+        if len(folder) >= 1:
+            os.makedirs(folder, exist_ok=True)
         np.save(path, self.data)
