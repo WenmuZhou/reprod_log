@@ -40,7 +40,7 @@ class ReprodDiffHelper:
         check_data(info1, info2)
         self.diff = compute_diff(info1, info2)
 
-    def report(self, diff_threshold: float=1e-6, path: str=None):
+    def report(self, diff_threshold: float=1e-6, path: str="./diff.txt"):
         """
         可视化diff，保存到文件或者到屏幕
         :param diff_threshold:
@@ -51,12 +51,14 @@ class ReprodDiffHelper:
 
         logger.info("{}".format('*' * 20))
         passed = True
-        for k, v in self.diff.items():
-            mean_value = v['diff'].mean()
-            logger.info("{}\t, diff mean: {}".format(k, mean_value))
-            if mean_value > diff_threshold:
+        for k, val in self.diff.items():
+            logger.info("{}:\t {}".format(k, val))
+            if val > diff_threshold:
                 logger.error('diff in {} failed the acceptance'.format(k))
                 passed = False
-                sys.exit(0)
         if passed:
-            logger.info('passed')
+            logger.info('diff check passed')
+        else:
+            logger.info('diff check failed')
+
+        return

@@ -43,7 +43,12 @@ def compute_diff(data1: dict, data2: dict, indent: str='\t'):
                 out_dict[f'{k}{indent}{sub_k}'] = sub_v
         elif isinstance(sub_data1, np.ndarray):
             diff = np.abs(sub_data1 - sub_data2)
-            out_dict[k] = {'out1': sub_data1, 'out2': sub_data2, 'diff': diff}
+            max_diff = np.max(diff)
+            mean_diff = np.mean(diff)
+            out_dict.update({
+                f"mean diff of {k}": mean_diff,
+                f"max diff of {k}": max_diff
+            })
         else:
             raise NotImplementedError
     return out_dict
