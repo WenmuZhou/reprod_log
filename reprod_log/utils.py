@@ -17,9 +17,10 @@ import logging
 import torch
 import paddle
 import numpy as np
+from typing import Union
 
 
-def init_logger(save_path=None):
+def init_logger(save_path: str=None):
     """
     benchmark logger
     """
@@ -64,7 +65,7 @@ def np2paddle(data: dict):
     return paddle_input
 
 
-def paddle2np(data):
+def paddle2np(data: Union[paddle.Tensor, dict]=None):
     if isinstance(data, dict):
         np_data = {}
         for k, v in data.items():
@@ -74,7 +75,7 @@ def paddle2np(data):
         return {'output': data.numpy()}
 
 
-def torch2np(data):
+def torch2np(data: Union[torch.Tensor, dict]=None):
     if isinstance(data, dict):
         np_data = {}
         for k, v in data.items():

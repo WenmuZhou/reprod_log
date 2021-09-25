@@ -20,7 +20,7 @@ from .compare import compute_diff, check_data
 
 
 class ReprodDiffHelper:
-    def load_info(self, path):
+    def load_info(self, path: str):
         """
         加载字典文件
         :param path:
@@ -29,7 +29,7 @@ class ReprodDiffHelper:
         data = np.load(path, allow_pickle=True).tolist()
         return data
 
-    def compare_info(self, info1, info2):
+    def compare_info(self, info1: dict, info2: dict):
         """
         对比diff
         :param info1:
@@ -40,7 +40,7 @@ class ReprodDiffHelper:
         check_data(info1, info2)
         self.diff = compute_diff(info1, info2)
 
-    def report(self, diff_threshold=1e-6, path=None):
+    def report(self, diff_threshold: float=1e-6, path: str=None):
         """
         可视化diff，保存到文件或者到屏幕
         :param diff_threshold:

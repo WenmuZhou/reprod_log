@@ -31,7 +31,7 @@ def check_data(data1: dict, data2: dict):
                 k, data2.keys())
 
 
-def compute_diff(data1: dict, data2: dict, indent='\t'):
+def compute_diff(data1: dict, data2: dict, indent: str='\t'):
     out_dict = {}
     for k in data1:
         assert k in data2
