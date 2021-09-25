@@ -98,24 +98,24 @@ def compare_loss_and_backward(torch_model: torch.nn.Module,
         paddle_loss_value = paddle_loss(paddle_input, paddle_outputs)
         paddle_loss_value['loss'].backward()
         paddle_optim.step()
-        paddle_optim.clear_grad()
 
         paddle_grad_dict = {'loss': paddle_loss_value['loss'].numpy()}
         for name, parms in paddle_model.named_parameters():
             if not parms.stop_gradient and parms.grad is not None:
                 paddle_grad_dict[name] = parms.grad.numpy()
+        paddle_optim.clear_grad()
 
         # torch
         torch_outputs = torch_model(**torch_input)
         torch_loss_value = torch_loss(torch_input, torch_outputs)
         torch_loss_value['loss'].backward()
         torch_optim.step()
-        torch_optim.zero_grad()
 
         torch_grad_dict = {'loss': torch_loss_value['loss'].detach().numpy()}
         for name, parms in torch_model.named_parameters():
             if parms.requires_grad and parms.grad is not None:
                 torch_grad_dict[name] = parms.grad.numpy()
+        torch_optim.zero_grad()
 
         # compare
         diff = compute_diff(paddle_grad_dict, torch_grad_dict)
