@@ -52,4 +52,4 @@ class ReprodLogger(object):
         self.data.clear()
 
     def save(self, path):
-        np.save('{}.data'.format(path), self.data)
+        np.save(path, self.data)
