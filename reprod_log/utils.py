@@ -1,5 +1,4 @@
 # Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
-# Copyright 2018 The Google AI Language Team Authors and The HuggingFace Inc. team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import os
 import logging
 import torch
@@ -29,9 +29,7 @@ def init_logger(save_path=None):
     if not os.path.exists(os.path.dirname(log_output)):
         os.makedirs(os.path.dirname(log_output))
     if save_path is None:
-        logging.basicConfig(
-            level=logging.INFO,
-            format=FORMAT)
+        logging.basicConfig(level=logging.INFO, format=FORMAT)
     else:
         logging.basicConfig(
             level=logging.INFO,

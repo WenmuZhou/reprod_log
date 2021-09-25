@@ -1,5 +1,4 @@
 # Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
-# Copyright 2018 The Google AI Language Team Authors and The HuggingFace Inc. team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +15,8 @@ import sys
 
 import numpy as np
 
-from utils import init_logger
-from compare import compute_diff, check_data
+from .utils import init_logger
+from .compare import compute_diff, check_data
 
 
 class ReprodDiffHelper:
