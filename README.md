@@ -42,7 +42,7 @@ pip3 install git+https://github.com/WenmuZhou/reprod_log.git --force-reinstall
   * paddle_model: paddle.nn.Layer,
   * input_dict: dict, dict值为numpy矩阵
   * diff_threshold: float=1e-6
-  * diff_method: str = 'mean' 检查diff的函数，目前支持 min,max,mean,all四种形式，并且支持min,max,mean的相互组合成的list形式，如['min','max]
+  * diff_method: str = 'mean' 检查diff的函数，目前支持 min,max,mean,all四种形式，并且支持min,max,mean的相互组合成的list形式，如['min','max']
 
 * compare_loss_and_backward 用于对比网络的反向过程，其参数为
   * torch_model: torch.nn.Module,
@@ -53,4 +53,4 @@ pip3 install git+https://github.com/WenmuZhou/reprod_log.git --force-reinstall
   * lr: float=1e-3,
   * steps: int=10,
   * diff_threshold: float=1e-6
-  * diff_method: str = 'mean' 检查diff的函数，目前支持 min,max,mean,all四种形式，并且支持min,max,mean的相互组合成的list形式，如['min','max]
+  * diff_method: str = 'mean' 检查diff的函数，目前支持 min,max,mean,all四种形式，并且支持min,max,mean的相互组合成的list形式，如['min','max']
