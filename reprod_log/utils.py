@@ -27,8 +27,9 @@ def init_logger(save_path: str=None):
     # Init logger
     FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     log_output = save_path
-    if not os.path.exists(os.path.dirname(log_output)):
-        os.makedirs(os.path.dirname(log_output))
+    dir_name = os.path.dirname(log_output)
+    if len(dir_name) > 0 and not os.path.exists(dir_name):
+        os.makedirs(dir_name)
     if save_path is None:
         logging.basicConfig(level=logging.INFO, format=FORMAT)
     else:
@@ -93,21 +94,39 @@ def check_print_diff(diff_dict,
                      print_func=print,
                      indent: str='\t',
                      level: int=0):
-    assert diff_threshold in ['min', 'max', 'mean']
+    """
+    对 diff 字典打印并进行检查的函数
+
+    :param diff_dict:
+    :param diff_method:
+    :param diff_threshold:
+    :param print_func:
+    :param indent:
+    :param level:
+    :return:
+    """
+    if level == 0:
+        if isinstance(diff_method, str):
+            if diff_method == 'all':
+                diff_method = ['min', 'max', 'mean']
+            else:
+                diff_method = [diff_method]
+    for method in diff_method:
+        assert method in ['all', 'min', 'max', 'mean']
+
     passed = True
-    cur_indent = '' if level == 0 else indent
+    cur_indent = indent * level
     for k, v in diff_dict.items():
         if 'mean' in v and 'min' in v and 'max' in v and len(v) == 3:
-            v = v[diff_method]
-            print_func("{}{}:\t {}".format(cur_indent, k, v))
-            if v > diff_threshold:
-                print_func('{}diff in {} failed the acceptance'.format(
-                    cur_indent, k))
-                passed = False
+            print_func('{}{}: '.format(cur_indent, k))
+            for method in diff_method:
+                if v[method] > diff_threshold:
+                    passed = False
+                print_func("{}{} diff: check passed: {}, value: {}".format(
+                    cur_indent + indent, method, passed, v[method]))
         else:
             print_func('{}{}'.format(cur_indent, k))
             sub_passed = check_print_diff(v, diff_method, diff_threshold,
-                                          print_func, cur_indent + indent,
-                                          level + 1)
+                                          print_func, indent, level + 1)
             passed = passed and sub_passed
     return passed
