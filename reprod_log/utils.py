@@ -98,7 +98,7 @@ def check_print_diff(diff_dict,
     对 diff 字典打印并进行检查的函数
 
     :param diff_dict:
-    :param diff_method:
+    :param diff_method: 检查diff的函数，目前支持 min,max,mean,all四种形式，并且支持min,max,mean的相互组合成的list形式，如['min','max]
     :param diff_threshold:
     :param print_func:
     :param indent:
