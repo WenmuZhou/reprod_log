@@ -61,7 +61,7 @@ def compare_forward(torch_model: torch.nn.Module,
                     paddle_model: paddle.nn.Layer,
                     input_dict: dict,
                     diff_threshold: float=1e-6,
-                    diff_method='mean'):
+                    diff_method: str='mean'):
     torch_input = np2torch(input_dict)
     paddle_input = np2paddle(input_dict)
 
@@ -90,7 +90,7 @@ def compare_loss_and_backward(torch_model: torch.nn.Module,
                               lr: float=1e-3,
                               steps: int=10,
                               diff_threshold: float=1e-6,
-                              diff_method='mean'):
+                              diff_method: str='mean'):
     torch_input = np2torch(input_dict)
     paddle_input = np2paddle(input_dict)
 
