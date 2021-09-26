@@ -17,7 +17,7 @@ import torch
 import paddle
 import numpy as np
 
-from .utils import np2torch, np2paddle, paddle2np, torch2np, print_diff
+from .utils import np2torch, np2paddle, paddle2np, torch2np, check_print_diff
 
 
 def check_data(data1: dict, data2: dict):
@@ -32,23 +32,26 @@ def check_data(data1: dict, data2: dict):
                 k, data2.keys())
 
 
-def compute_diff(data1: dict, data2: dict, indent: str='\t'):
+def compute_diff(data1: dict, data2: dict):
     out_dict = {}
     for k in data1:
         assert k in data2
         sub_data1, sub_data2 = data1[k], data2[k]
         assert type(sub_data1) == type(sub_data2)
         if isinstance(sub_data1, dict):
-            out = compute_diff(sub_data1, sub_data2, indent)
-            for sub_k, sub_v in out.items():
-                out_dict[f'{k}{indent}{sub_k}'] = sub_v
+            out = compute_diff(sub_data1, sub_data2)
+            out_dict[k] = out
         elif isinstance(sub_data1, np.ndarray):
             if sub_data1.shape != sub_data2.shape and sub_data1.transpose(
             ).shape == sub_data2.shape:
                 print('transpose sub_data1')
                 sub_data1 = sub_data1.transpose()
             diff = np.abs(sub_data1 - sub_data2)
-            out_dict[k] = {'out1': sub_data1, 'out2': sub_data2, 'diff': diff}
+            out_dict[k] = {
+                'mean': diff.mean(),
+                'max': diff.max(),
+                'min': diff.min()
+            }
         else:
             raise NotImplementedError
     return out_dict
@@ -57,7 +60,8 @@ def compute_diff(data1: dict, data2: dict, indent: str='\t'):
 def compare_forward(torch_model: torch.nn.Module,
                     paddle_model: paddle.nn.Layer,
                     input_dict: dict,
-                    diff_threshold: float=1e-6):
+                    diff_threshold: float=1e-6,
+                    diff_method='mean'):
     torch_input = np2torch(input_dict)
     paddle_input = np2paddle(input_dict)
 
@@ -66,8 +70,12 @@ def compare_forward(torch_model: torch.nn.Module,
     torch_out = torch_model(**torch_input)
     paddle_out = paddle_model(**paddle_input)
 
-    diff = compute_diff(torch2np(torch_out), paddle2np(paddle_out))
-    passed = print_diff(diff, diff_threshold)
+    diff_dict = compute_diff(torch2np(torch_out), paddle2np(paddle_out))
+    passed = check_print_diff(
+        diff_dict,
+        diff_method=diff_method,
+        diff_threshold=diff_threshold,
+        print_func=print)
     if passed:
         print('diff check passed')
     else:
@@ -81,7 +89,8 @@ def compare_loss_and_backward(torch_model: torch.nn.Module,
                               input_dict: dict,
                               lr: float=1e-3,
                               steps: int=10,
-                              diff_threshold: float=1e-6):
+                              diff_threshold: float=1e-6,
+                              diff_method='mean'):
     torch_input = np2torch(input_dict)
     paddle_input = np2paddle(input_dict)
 
@@ -118,9 +127,15 @@ def compare_loss_and_backward(torch_model: torch.nn.Module,
         torch_optim.zero_grad()
 
         # compare
-        diff = compute_diff(paddle_grad_dict, torch_grad_dict)
-        passed = print_diff(diff, diff_threshold)
-        if not passed:
-            print('diff check failed at iter {}'.format(i))
-            sys.exit()
+        diff_dict = compute_diff(paddle_grad_dict, torch_grad_dict)
+        passed = check_print_diff(
+            diff_dict,
+            diff_method=diff_method,
+            diff_threshold=diff_threshold,
+            print_func=print)
+        if passed:
+            print('diff check passed in iter {}'.format(i))
+        else:
+            print('diff check failed in iter {}'.format(i))
+            return
     print('diff check passed')

@@ -87,13 +87,27 @@ def torch2np(data: Union[torch.Tensor, dict]=None):
         return {'output': data.detach().numpy()}
 
 
-def print_diff(diff_dict, diff_threshold: float=1e-6):
-    print("{}".format('*' * 20))
+def check_print_diff(diff_dict,
+                     diff_method='mean',
+                     diff_threshold: float=1e-6,
+                     print_func=print,
+                     indent: str='\t',
+                     level: int=0):
+    assert diff_threshold in ['min', 'max', 'mean']
     passed = True
+    cur_indent = '' if level == 0 else indent
     for k, v in diff_dict.items():
-        mean_value = v['diff'].mean()
-        print("{}\t, diff mean: {}".format(k, mean_value))
-        if mean_value > diff_threshold:
-            print('diff in {} check failed'.format(k))
-            passed = False
+        if 'mean' in v and 'min' in v and 'max' in v and len(v) == 3:
+            v = v[diff_method]
+            print_func("{}{}:\t {}".format(cur_indent, k, v))
+            if v > diff_threshold:
+                print_func('{}diff in {} failed the acceptance'.format(
+                    cur_indent, k))
+                passed = False
+        else:
+            print_func('{}{}'.format(cur_indent, k))
+            sub_passed = check_print_diff(v, diff_method, diff_threshold,
+                                          print_func, cur_indent + indent,
+                                          level + 1)
+            passed = passed and sub_passed
     return passed

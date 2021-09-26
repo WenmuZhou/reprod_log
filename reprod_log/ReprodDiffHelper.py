@@ -16,7 +16,7 @@ import sys
 
 import numpy as np
 
-from .utils import init_logger
+from .utils import init_logger, check_print_diff
 from .compare import compute_diff, check_data
 
 
@@ -40,25 +40,29 @@ class ReprodDiffHelper:
         """
         assert isinstance(info1, dict) and isinstance(info2, dict)
         check_data(info1, info2)
-        self.diff = compute_diff(info1, info2)
+        self.diff_dict = compute_diff(info1, info2)
 
-    def report(self, diff_threshold: float=1e-6, path: str=None):
+    def report(self,
+               diff_method='mean',
+               diff_threshold: float=1e-6,
+               path: str="./diff.txt"):
         """
         可视化diff，保存到文件或者到屏幕
         :param diff_threshold:
         :param path:
         :return:
         """
+
         logger = init_logger(path)
 
-        logger.info("{}".format('*' * 20))
-        passed = True
-        for k, v in self.diff.items():
-            mean_value = v['diff'].mean()
-            logger.info("{}\t, diff mean: {}".format(k, mean_value))
-            if mean_value > diff_threshold:
-                logger.error('diff in {} failed the acceptance'.format(k))
-                passed = False
-                sys.exit(0)
+        passed = check_print_diff(
+            self.diff_dict,
+            diff_method=diff_method,
+            diff_threshold=diff_threshold,
+            print_func=logger.info)
         if passed:
-            logger.info('passed')
+            logger.info('diff check passed')
+        else:
+            logger.info('diff check failed')
+
+        return
