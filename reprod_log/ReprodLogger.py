@@ -18,7 +18,11 @@ import numpy as np
 
 class ReprodLogger(object):
     def __init__(self):
-        self.data = dict()
+        self._data = dict()
+
+    @property
+    def data(self):
+        return self._data
 
     def add(self, key, val):
         """
@@ -32,7 +36,7 @@ class ReprodLogger(object):
                 2. Torch CPU: torch_tensor.detach().numpy()
                 3. Paddle: paddle_tensor.numpy()'''
         assert isinstance(val, np.ndarray), msg
-        self.data[key] = val
+        self._data[key] = val
 
     def remove(self, key):
         """
@@ -40,20 +44,20 @@ class ReprodLogger(object):
         :param key:
         :return:
         """
-        if key in self.data:
-            self.data.pop(key)
+        if key in self._data:
+            self._data.pop(key)
         else:
-            print('{} is not in {}'.format(key, self.data.keys()))
+            print('{} is not in {}'.format(key, self._data.keys()))
 
     def clear(self):
         """
         清空字典
         :return:
         """
-        self.data.clear()
+        self._data.clear()
 
     def save(self, path):
         folder = os.path.dirname(path)
         if len(folder) >= 1:
             os.makedirs(folder, exist_ok=True)
-        np.save(path, self.data)
+        np.save(path, self._data)
