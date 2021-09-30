@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import sys
 import logging
 import torch
 import paddle
@@ -20,29 +21,24 @@ import numpy as np
 from typing import Union
 
 
-def init_logger(save_path: str=None):
-    """
-    benchmark logger
-    """
-    # Init logger
-    FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    log_output = save_path
-    dir_name = os.path.dirname(log_output)
-    if len(dir_name) > 0 and not os.path.exists(dir_name):
-        os.makedirs(dir_name)
-    if save_path is None:
-        logging.basicConfig(level=logging.INFO, format=FORMAT)
-    else:
-        logging.basicConfig(
-            level=logging.INFO,
-            format=FORMAT,
-            handlers=[
-                logging.FileHandler(
-                    filename=log_output, mode='w'),
-                logging.StreamHandler(),
-            ])
-    logger = logging.getLogger(__name__)
-    logger.info("Init logger done!")
+def init_logger(log_file=None, name='root', log_level=logging.DEBUG):
+    logger = logging.getLogger(name)
+
+    formatter = logging.Formatter(
+        '[%(asctime)s] %(name)s %(levelname)s: %(message)s',
+        datefmt="%Y/%m/%d %H:%M:%S")
+
+    stream_handler = logging.StreamHandler(stream=sys.stdout)
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+    if log_file is not None:
+        dir_name = os.path.dirname(log_file)
+        if len(dir_name) > 0 and not os.path.exists(dir_name):
+            os.makedirs(dir_name)
+        file_handler = logging.FileHandler(log_file, 'w')
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+    logger.setLevel(log_level)
     return logger
 
 
