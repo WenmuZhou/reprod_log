@@ -110,19 +110,21 @@ def check_print_diff(diff_dict,
     for method in diff_method:
         assert method in ['all', 'min', 'max', 'mean']
 
-    passed = True
+    all_passed = True
     cur_indent = indent * level
     for k, v in diff_dict.items():
         if 'mean' in v and 'min' in v and 'max' in v and len(v) == 3:
             print_func('{}{}: '.format(cur_indent, k))
+            sub_passed = True
             for method in diff_method:
                 if v[method] > diff_threshold:
-                    passed = False
+                    sub_passed = False
                 print_func("{}{} diff: check passed: {}, value: {}".format(
-                    cur_indent + indent, method, passed, v[method]))
+                    cur_indent + indent, method, sub_passed, v[method]))
+                all_passed = all_passed and sub_passed
         else:
             print_func('{}{}'.format(cur_indent, k))
             sub_passed = check_print_diff(v, diff_method, diff_threshold,
                                           print_func, indent, level + 1)
-            passed = passed and sub_passed
-    return passed
+            all_passed = all_passed and sub_passed
+    return all_passed
