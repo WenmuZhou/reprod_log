@@ -29,7 +29,7 @@ def check_data(data1: dict, data2: dict):
     for k in data2:
         if k not in data1:
             assert k in data1, '{} in data2 but not found in {}'.format(
-                k, data2.keys())
+                k, data1.keys())
 
 
 def compute_diff(data1: dict, data2: dict):
