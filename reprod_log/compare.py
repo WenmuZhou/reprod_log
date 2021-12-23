@@ -11,9 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
 
-import torch
 import paddle
 import numpy as np
 
@@ -57,7 +55,7 @@ def compute_diff(data1: dict, data2: dict):
     return out_dict
 
 
-def compare_forward(torch_model: torch.nn.Module,
+def compare_forward(torch_model,
                     paddle_model: paddle.nn.Layer,
                     input_dict: dict,
                     diff_threshold: float=1e-6,
@@ -82,15 +80,17 @@ def compare_forward(torch_model: torch.nn.Module,
         print('diff check failed')
 
 
-def compare_loss_and_backward(torch_model: torch.nn.Module,
+def compare_loss_and_backward(torch_model,
                               paddle_model: paddle.nn.Layer,
-                              torch_loss: torch.nn.Module,
+                              torch_loss,
                               paddle_loss: paddle.nn.Layer,
                               input_dict: dict,
                               lr: float=1e-3,
                               steps: int=10,
                               diff_threshold: float=1e-6,
                               diff_method: str='mean'):
+    import torch
+
     torch_input = np2torch(input_dict)
     paddle_input = np2paddle(input_dict)
 

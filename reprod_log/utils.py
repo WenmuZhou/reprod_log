@@ -15,7 +15,6 @@
 import os
 import sys
 import logging
-import torch
 import paddle
 import numpy as np
 from typing import Union
@@ -43,6 +42,8 @@ def init_logger(log_file=None, name='root', log_level=logging.DEBUG):
 
 
 def np2torch(data: dict):
+    import torch
+
     assert isinstance(data, dict)
     torch_input = {}
     for k, v in data.items():
@@ -74,7 +75,7 @@ def paddle2np(data: Union[paddle.Tensor, dict]=None):
         return {'output': data.numpy()}
 
 
-def torch2np(data: Union[torch.Tensor, dict]=None):
+def torch2np(data):
     if isinstance(data, dict):
         np_data = {}
         for k, v in data.items():

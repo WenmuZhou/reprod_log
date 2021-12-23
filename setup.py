@@ -19,7 +19,7 @@ with open('requirements.txt', encoding="utf-8-sig") as f:
 
 setup(
     name='reprod_log',
-    version='1.0.0',
+    version='1.0.1',
     install_requires=requirements,
     license='Apache License 2.0',
     keywords='reprod_log',
