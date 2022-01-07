@@ -57,7 +57,7 @@ pip3 install git+https://github.com/WenmuZhou/reprod_log.git --force-reinstall
                 * path (str): 日志文件路径
             * 返回: dict信息，key为str，value为numpy.ndarray
         * compare_info(info1, info2)
-            * 功能：计算两个字典对于相同key的value的diff，具体计算方法为`diff = np.abs(info1[key] - np.abs(info[key]))`
+            * 功能：计算两个字典对于相同key的value的diff，具体计算方法为`diff = np.abs(info1[key] - info2[key])`
             * 输入:
                 * info1/info2 (dict): PaddlePaddle与参考代码保存的文件信息
             * 返回: diff的dict信息
